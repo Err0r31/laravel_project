@@ -26,8 +26,8 @@ Route::resource('/article', ArticleController::class)->middleware('auth:sanctum'
 Route::controller(CommentController::class)->prefix('/comment')->middleware('auth:sanctum')->group(function () {
     Route::post('', 'store');
     Route::get('/{id}/edit', 'edit');
-    Route::post('{comment}/update', 'update');
-    Route::get('{id}/delete', 'delete');
+    Route::post('/{comment}/update', 'update');
+    Route::get('/{id}/delete', 'destroy');
 }); 
 
 Route::get('/', [MainController::class, 'index']);

@@ -1,6 +1,17 @@
 @extends('layout')
 @section('content')
 @use('\App\Models\User', 'User')
+
+@if(session('status') == 'Delete success')
+  <div class="alert alert-success">
+      {{ session('status') }}
+  </div>
+@elseif(session('status') == 'Delete comment failed')
+  <div class="alert alert-danger">
+    {{ session('status') }}
+  </div>
+@endif
+
 <div class="card text-center">
     <div class="card-header">
       Author: {{ $auth->name }}
@@ -33,8 +44,8 @@
 <form action="/comment" method="POST">
   @csrf
     <div class="mb-3">
-    <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" id="name" name="name">
+    <label for="title" class="form-label">Name</label>
+    <input type="text" class="form-control" id="title" name="title">
   </div>
   <div class="mb-3">
     <label for="desc" class="form-label">Description</label>
@@ -49,10 +60,12 @@
   <div class="col-sm-6 mb-3 mb-sm-0 mt-3">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">{{$comment->name}}</h5>
+        <h5 class="card-title">{{$comment->title}}</h5>
         <p class="card-text">{{$comment->desc}}</p>
+        @can('update_comment', $comment)
         <a href="/comment/{{$comment->id}}/edit" class="btn btn-primary">Comment update</a>
-        <a href="/comment/{{$comment->id}}/delete" class="btn btn-warning">Comment delete</a>        
+        <a href="/comment/{{$comment->id}}/delete" class="btn btn-warning">Comment delete</a>      
+        @endcan
       </div>
     </div>
   </div>
