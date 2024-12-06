@@ -36,7 +36,10 @@
                         <a class="nav-link active" aria-current="page" href="/article/create">Create article</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link" href="/contacts">Контакты</a>
+                        <a class="nav-link active" aria-current="page" href="/comment/index">All comments</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="/contacts">Contacts</a>
                         </li>
                     </ul>
                     @guest

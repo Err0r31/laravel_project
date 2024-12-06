@@ -12,6 +12,16 @@
   </div>
 @endif
 
+@if(session('status') == 'Comment update success')
+  <div class="alert alert-success">
+      {{ session('status') }}
+  </div>
+@elseif(session('status') == 'Update failed')
+  <div class="alert alert-danger">
+    {{ session('status') }}
+  </div>
+@endif
+
 <div class="card text-center">
     <div class="card-header">
       Author: {{ $auth->name }}

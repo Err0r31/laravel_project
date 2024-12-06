@@ -11,7 +11,7 @@
     </div>
 @endif
 
-<form action="/articles" method="POST">
+<form action="/article" method="POST">
     @csrf
     <div class="mb-3">
         <label for="date" class="form-label">Date</label>

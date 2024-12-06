@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 use App\Providers\ArticleServiceProvider;
 
@@ -18,7 +19,7 @@ class ArticleController extends Controller
     public function index()
     {
         $articles = Article::latest()->paginate(6);
-        return view('articles.index', ['articles' => $articles]);
+        return view('article.index', ['articles' => $articles]);
     }
 
     /**
@@ -26,7 +27,7 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        return view('articles.create');
+        return view('article.create');
     }
 
     /**
@@ -44,9 +45,9 @@ class ArticleController extends Controller
         $article->date = $request->date;
         $article->name = $request->name;
         $article->text = $request->desc;
-        $article->user_id = 1;
+        $article->user_id = Auth::id();
         $article->save();
-        return redirect('/articles');
+        return redirect('/article');
     }
 
     /**
@@ -54,9 +55,9 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        $comments = Comment::where('article_id', $article->id)->get();
+        $comments = Comment::where('article_id', $article->id)->where('accept', true)->get();
         $auth = User::findOrFail($article->user_id);
-        return view('articles.show', ['article' => $article, 'auth' => $auth, 'comments' => $comments]);
+        return view('article.show', ['article' => $article, 'auth' => $auth, 'comments' => $comments]);
     }
 
     /**
@@ -64,7 +65,7 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        return view('articles.update', ['article' => $article]);
+        return view('article.update', ['article' => $article]);
     }
 
     /**
@@ -82,8 +83,8 @@ class ArticleController extends Controller
         $article->name = $request->name;
         $article->text = $request->desc;
         $article->user_id = 1;
-        if ($article->save()) return redirect('/articles')->with('status', 'Update success');
-        else return redirect()->route('articles.index')->with('status', 'Update failed');
+        if ($article->save()) return redirect('/article')->with('status', 'Update success');
+        else return redirect()->route('article.index')->with('status', 'Update failed');
     }
 
     /**
@@ -91,7 +92,7 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        if ($article->delete()) return redirect('/articles')->with('status', 'Delete success');
+        if ($article->delete()) return redirect('/article')->with('status', 'Delete success');
         else return redirect()->route('article.show', ['article'=>$article->id])->with('status','Delete don`t success');
     }
 }
