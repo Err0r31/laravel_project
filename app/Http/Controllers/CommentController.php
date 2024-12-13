@@ -10,17 +10,27 @@ use App\Notifications\NewCommentNotify;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use App\Jobs\VeryLongJob;
 
 
 class CommentController extends Controller
 {
     public function index() {
-        $comments = Comment::with(['article', 'user'])->latest()->paginate(10);
+        $page = isset($_GET['page']) ? $_GET['page'] : 0;
+        $comments = Cache::remember('comments'.$page, 3000, function() {
+            return Comment::with(['article', 'user'])->latest()->paginate(10);
+        });
         return view('comment.index', ['comments'=>$comments]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request) {
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comments*[0-9]'])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+
         $request->validate([
             'title'=>'required|min:4',
             'desc'=>'required|max:256'
@@ -38,13 +48,22 @@ class CommentController extends Controller
         else return redirect()->back()->with('status', 'Add failed');        
     }
 
-    public function edit($id){
+    public function edit($id) {
         $comment = Comment::findOrFail($id);
         Gate::authorize('update_comment', $comment); 
         return view('comment.update', ['comment'=>$comment]);
     }
 
-    public function update(Request $request, Comment $comment){
+    public function update(Request $request, Comment $comment) {
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comments*[0-9]'])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comment_article'.$comment->article_id])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+
         Gate::authorize('update_comment', $comment); 
         $request->validate([
             'title'=>'required|min:4',
@@ -59,21 +78,41 @@ class CommentController extends Controller
         } 
     }
 
-    public function delete($id){
+    public function delete($id) {
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comments*[0-9]'])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comment_article'.$comment->article_id])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+
         $comment = Comment::findOrFail($id);
         Gate::authorize('update_comment', $comment);
         if ($comment->delete()) return redirect()->route('article.show', $comment->article_id)->with('status', 'Delete success');
         else return redirect()->route('article.show', $comment->article_id)->with('status', 'Delete comment failed');
     }
 
-    public function accept(Comment $comment){
+    public function accept(Comment $comment) {
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comments*[0-9]'])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comment_article'.$comment->article_id])->get();
+        foreach($keys as $param) {
+            Cache::forget($param->key);
+        }
+
         $users = User::where('id', '!=', $comment->user_id)->get();
         $article = Article::findOrFail($comment->article_id);
         $comment->accept = true;
         if ($comment->save()) Notification::send($users, new NewCommentNotify($article, $comment->name));
         return redirect()->route('comment.index');
     }
-    public function reject(Comment $comment){
+
+    public function reject(Comment $comment) {
+        Cache::flush();
         $comment->accept = false;
         $comment->save();
         return redirect()->route('comment.index');
