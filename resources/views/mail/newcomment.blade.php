@@ -6,4 +6,3 @@
       <p>Для модерации комментария перейдите по ссылке</p><a href="http://127.0.0.1:3000/comment/index" class="card-link">New comment</a>
     </div>
 </div>
-  

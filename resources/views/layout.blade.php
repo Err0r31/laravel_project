@@ -41,7 +41,20 @@
                         <li class="nav-item">
                         <a class="nav-link" href="/contacts">Contacts</a>
                         </li>
+                        @auth
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Notifications {{ auth()->user()->unreadNotifications->count() }}
+                            </a>
+                            <ul class="dropdown-menu" aria-label="navbarDropdown">
+                                @foreach (auth()->user()->unreadNotifications as $notification)
+                                    <li><a class="dropdown-item" href="{{ route('article.show', ['article'=>$notification->data['article']['id'], 'notify'=>$notification->id]) }}">{{ $notification->data['article']['name'] }}: {{ $notification->data['comment_name'] }}</a></li>
+                                @endforeach
+                            </ul>
+                        </li>
+                        @endauth
                     </ul>
+                    
                     @guest
                     <a href="/auth/signup" class="btn btn-outline-success me-2">SignUp</a>
                     <a href="/auth/login" class="btn btn-outline-success me-2">SignIn</a>
