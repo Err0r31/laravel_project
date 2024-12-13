@@ -7,9 +7,8 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-
+use App\Events\NewArticleEvent;
 use App\Providers\ArticleServiceProvider;
-
 
 class ArticleController extends Controller
 {
@@ -46,8 +45,10 @@ class ArticleController extends Controller
         $article->name = $request->name;
         $article->text = $request->desc;
         $article->user_id = Auth::id();
-        $article->save();
-        return redirect('/article');
+        if ($article->save()) {
+            NewArticleEvent::dispatch($article);
+            return redirect('/article');
+        }   
     }
 
     /**

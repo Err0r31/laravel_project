@@ -17,8 +17,10 @@ class NewCommentMail extends Mailable
 {
     use Queueable, SerializesModels;
     
-    public function __construct(public Comment $comment, public $article) {
-        $this->article = Article::findOrFail($article);
+    public $article;
+
+    public function __construct(public Comment $comment) {
+        $this->article = Article::findOrFail($comment->article_id);
     }
 
     public function envelope(): Envelope
@@ -34,7 +36,7 @@ class NewCommentMail extends Mailable
         return new Content(
             view: 'mail.newcomment',
             with:[
-                'article'=>$this->article->name,
+                'article'=>$this->article,
                 'comment'=>$this->comment->desc,
             ]
         );

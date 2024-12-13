@@ -30,8 +30,8 @@
       <h5 class="card-title">{{ $article->name }}</h5>
       <p class="card-text">{{ $article->text }}</p>
       <div class="d-flex align-items-center gap-2 justify-content-center">
-          <a href="/articles/{{ $article->id }}/edit" class="btn btn-primary">Edit article</a>
-          <form action="/articles/{{ $article->id }}" method="POST">
+          <a href="/article/{{ $article->id }}/edit" class="btn btn-primary">Edit article</a>
+          <form action="/article/{{ $article->id }}" method="POST">
             @method('DELETE')
             @csrf
             <button type="submit" class="btn btn-primary">Delete article</button>

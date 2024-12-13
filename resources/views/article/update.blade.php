@@ -17,7 +17,7 @@
     </div>
 @endif
 
-<form action="/articles/{{ $article->id }}" method="POST">
+<form action="/article/{{ $article->id }}" method="POST">
     @method('PUT')
     @csrf
     <div class="mb-3">
