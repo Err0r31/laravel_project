@@ -22,6 +22,7 @@ Route::get('/', function () {
 });
 
 Route::resource('/article', ArticleController::class)->middleware('auth:sanctum');
+Route::get('/article/{article}', [ArticleController::class, 'show'])->name('article.show')->middleware('checkClick');
 
 Route::controller(CommentController::class)->prefix('/comment')->middleware('auth:sanctum')->group(function () {
     Route::post('', 'store')->name('comment.store');

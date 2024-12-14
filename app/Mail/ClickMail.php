@@ -9,38 +9,44 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
-use Illuminate\Mail\Mailables\Attachment;
-use App\Models\Comment;
-use App\Models\Article;
 
-class NewCommentMail extends Mailable
+class ClickMail extends Mailable
 {
     use Queueable, SerializesModels;
-    
-    public $article;
 
-    public function __construct(public Comment $comment) {
-        $this->article = Article::findOrFail($comment->article_id);
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(public $article_count, public $comment_count)
+    {
+        //
     }
 
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
             from: new Address(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME')),
-            subject: 'New Comment Mail',
+            subject: 'Stat Mail',
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
         return new Content(
-            view: 'mail.newcomment',
-            with:[
-                'article'=>$this->article,
-                'comment'=>$this->comment->desc,
-            ]
+            markdown: 'mail.click-shipped',
+            with: [
+                'article_count'=>$this->article_count,
+                'comment_count'=>$this->comment_count,
+            ],
         );
     }
+
     /**
      * Get the attachments for the message.
      *
@@ -48,8 +54,6 @@ class NewCommentMail extends Mailable
      */
     public function attachments(): array
     {
-        return [
-            Attachment::fromPath(public_path().'/preview.jpg'),
-        ];
+        return [];
     }
 }

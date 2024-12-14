@@ -27,16 +27,16 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/about">О нас</a>
+                        <a class="nav-link @active('about')" aria-current="page" href="/about">О нас</a>
+                        </li> 
+                        <li class="nav-item">
+                        <a class="nav-link @active('article')" aria-current="page" href="/article">Articles</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/article">Articles</a>
+                        <a class="nav-link @active('article/create')" aria-current="page" href="/article/create">Create article</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/article/create">Create article</a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/comment/index">All comments</a>
+                        <a class="nav-link @active('comment/index')" aria-current="page" href="/comment/index">All comments</a>
                         </li>
                         <li class="nav-item">
                         <a class="nav-link" href="/contacts">Contacts</a>
