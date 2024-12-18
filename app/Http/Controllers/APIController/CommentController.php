@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\APIController;
+use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use App\Models\Comment;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\VeryLongJob;
-
+use Spatie\FlareClient\Solutions\ReportSolution;
 
 class CommentController extends Controller
 {
@@ -21,8 +22,9 @@ class CommentController extends Controller
         $page = isset($_GET['page']) ? $_GET['page'] : 0;
         $comments = Cache::remember('comments'.$page, 3000, function() {
             return Comment::with(['article', 'user'])->latest()->paginate(10);
-        });
-        return view('comment.index', ['comments'=>$comments]);
+        }); 
+        // return view('comment.index', ['comments'=>$comments]);
+        return response()->json($comments);
     }
 
     public function store(Request $request) {
@@ -43,15 +45,15 @@ class CommentController extends Controller
         $comment->user_id = Auth::id();
         if ($comment->save()) {
             VeryLongJob::dispatch($comment);
-            return redirect()->back()->with('status', 'Add new comment');
-        }
-        else return redirect()->back()->with('status', 'Add failed');        
+            return response()->json(1);
+        }     
     }
 
     public function edit($id) {
         $comment = Comment::findOrFail($id);
         Gate::authorize('update_comment', $comment); 
-        return view('comment.update', ['comment'=>$comment]);
+        // return view('comment.update', ['comment'=>$comment]);
+        return response()->json($comment);
     }
 
     public function update(Request $request, Comment $comment) {
@@ -72,9 +74,11 @@ class CommentController extends Controller
         $comment->title = request('title');
         $comment->desc = request('desc'); 
         if ($comment->save()) {
-            return redirect()->route('article.show', $comment->article_id)->with('status', 'Comment update success');
+            return response()->json(1);
+            // return redirect()->route('article.show', $comment->article_id)->with('status', 'Comment update success');
         } else {
-            return redirect()->back()->with('status', 'Update failed');
+            return response()->json(0);
+            // return redirect()->back()->with('status', 'Update failed');
         } 
     }
 
@@ -89,10 +93,12 @@ class CommentController extends Controller
         foreach($keys as $param) {
             Cache::forget($param->key);
         }
-
         
         Gate::authorize('update_comment', $comment);
-        if ($comment->delete()) return redirect()->route('article.show', $comment->article_id)->with('status', 'Delete success');
+        if ($comment->delete()) {
+            return response()->json();
+            // return redirect()->route('article.show', $comment->article_id)->with('status', 'Delete success');
+        }
         else return redirect()->route('article.show', $comment->article_id)->with('status', 'Delete comment failed');
     }
 
